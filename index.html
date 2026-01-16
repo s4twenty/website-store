@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Store | Ultimate Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- 1. CSS VARIABLES & THEME --- */
+        :root {
+            /* Colors - Dark Mode (Default) */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-nav: rgba(15, 23, 42, 0.85);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1; /* Indigo Neon */
+            --accent: #06b6d4; /* Cyan Neon */
+            --danger: #ef4444;
+            --success: #22c55e;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            
+            /* Spacing & Radius */
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --container: 1200px;
+        }
+
+        /* Light Mode Overrides */
+        [data-theme="light"] {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-nav: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(0, 0, 0, 0.1);
+            --glass: rgba(0, 0, 0, 0.03);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- 2. RESET & BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+        input, select { font-family: inherit; }
+
+        /* --- 3. COMPONENTS --- */
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
+        
+        /* Buttons */
+        .btn { padding: 10px 24px; border-radius: 50px; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6); }
+        .btn-outline { border: 2px solid var(--border); background: transparent; color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 0.9rem; }
+        .btn-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* Badge */
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-hot { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .badge-new { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+
+        /* Toast Notification */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); padding: 15px 20px; border-radius: var(--radius-md); box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s forwards; color: var(--text-main); border: 1px solid var(--border); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Form Elements */
+        .input-group { display: flex; gap: 10px; }
+        .input-modern { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 50px; color: var(--text-main); outline: none; width: 100%; transition: border-color 0.3s; }
+        .input-modern:focus { border-color: var(--primary); }
+        .select-modern { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 15px; border-radius: 50px; color: var(--text-main); outline: none; cursor: pointer; }
+
+        /* --- 4. NAVBAR --- */
+        nav { position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); background: var(--bg-nav); border-bottom: 1px solid var(--border); height: 70px; display: flex; align-items: center; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .logo { font-size: 1.5rem; font-weight: 700; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        .nav-links { display: flex; gap: 15px; align-items: center; }
+        .nav-item { cursor: pointer; font-weight: 500; position: relative; display: flex; align-items: center; gap: 5px; }
+        .nav-item:hover { color: var(--primary); }
+        .icon-badge-wrapper { position: relative; }
+        .counter-badge { position: absolute; top: -5px; right: -8px; background: var(--danger); color: white; font-size: 0.6rem; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+
+        /* --- 5. HERO SECTION --- */
+        #hero { padding-top: 100px; min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden; }
+        .hero-bg { position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: radial-gradient(circle, var(--primary) 0%, transparent 70%); opacity: 0.2; filter: blur(80px); z-index: -1; }
+        .hero-content { max-width: 600px; animation: fadeUp 0.8s ease; }
+        .hero-title { font-size: 3.5rem; line-height: 1.2; margin-bottom: 20px; }
+        .hero-subtitle { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 30px; }
+        
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 6. PRODUCTS SECTION --- */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 20px; flex-wrap: wrap; gap: 15px; }
+        .filter-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .product-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); transition: transform 0.3s; position: relative; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: var(--shadow); border-color: var(--primary); }
+        .card-img { height: 200px; width: 100%; object-fit: cover; background: #222; }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; }
+        .card-price { color: var(--accent); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; }
+        .card-rating { color: #facc15; font-size: 0.9rem; margin-bottom: 15px; }
+        .card-actions { margin-top: auto; display: flex; gap: 10px; }
+        
+        /* Wishlist Button on Card */
+        .wishlist-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); color: white; transition: all 0.2s; border: none; }
+        .wishlist-toggle:hover { transform: scale(1.1); }
+        .wishlist-toggle.active { background: var(--danger); color: white; box-shadow: 0 0 10px var(--danger); }
+        
+        /* Empty State */
+        .empty-state { width: 100%; text-align: center; padding: 50px 0; color: var(--text-muted); grid-column: 1 / -1; }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+
+        /* --- 7. FLASH SALE --- */
+        .flash-sale { background: linear-gradient(90deg, #312e81, #4c1d95); padding: 40px 0; border-radius: var(--radius-lg); margin: 40px 0; text-align: center; color: white; position: relative; overflow: hidden; }
+        .timer { font-size: 2rem; font-weight: 800; font-family: monospace; margin: 15px 0; letter-spacing: 2px; }
+
+        /* --- 8. CART & MODALS --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box { background: var(--bg-body); width: 90%; max-width: 800px; border-radius: var(--radius-lg); padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+        
+        /* Cart List */
+        .cart-item, .history-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
+        .cart-info { flex: 1; }
+        .cart-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { background: var(--bg-card); width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); color: var(--text-main); display: flex; align-items: center; justify-content: center; }
+
+        /* Promo Section */
+        .promo-section { margin-top: 20px; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: var(--radius-md); border: 1px dashed var(--primary); }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+        .discount-text { color: var(--success); font-weight: bold; }
+
+        /* History List */
+        .history-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.2s; }
+        .history-card:hover { border-color: var(--primary); }
+        .history-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; }
+        .history-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-muted); }
+        .history-card.open .history-details { display: block; }
+        
+        /* Detail Product Layout */
+        .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .detail-specs li { margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        .detail-specs i { color: var(--primary); margin-right: 8px; }
+        
+        /* Recommendations */
+        .recommendation-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; }
+        .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-top: 15px; }
+        .rec-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 10px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
+        .rec-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .rec-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 5px; }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 60px; color: var(--text-muted); text-align: center; }
+
+        /* Loading */
+        .loader { border: 4px solid var(--bg-card); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .detail-layout { grid-template-columns: 1fr; }
+            .nav-links span { display: none; } /* Hide text on mobile nav */
+            .nav-links i { font-size: 1.2rem; }
+            .input-group { flex-direction: column; }
+            .search-bar input { width: 150px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div id="toast-container"></div>
+
+    <nav>
+        <div class="container nav-content">
+            <div class="logo" onclick="app.navigate('home')">
+                <i class="fas fa-bolt"></i> NEON
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" class="input-modern" placeholder="Cari produk..." onkeyup="app.searchProducts(this.value)" style="width: 200px;">
+            </div>
+
+            <div class="nav-links">
+                <div class="nav-item" onclick="app.toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </div>
+                
+                <div class="nav-item" onclick="app.openModal('history-modal')">
+                    <i class="fas fa-clipboard-list"></i> <span>Order</span>
+                </div>
+
+                <div class="nav-item" onclick="app.openModal('wishlist-modal')">
+                    <div class="icon-badge-wrapper">
+                        <i class="fas fa-heart"></i>
+                        <div class="counter-badge" id="wishlist-count">0</div>
+                    </div>
+                </div>
+
+                <div class="nav-item" onclick="app.openCart()">
+                    <div class="icon-badge-wrapper">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="counter-badge" id="cart-count">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <section id="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <span class="badge badge-new" style="margin-bottom: 10px; display: inline-block;">New Arrival 2026</span>
+                <h1 class="hero-title">Teknologi Masa Depan <br><span style="color: var(--primary)">Dalam Genggaman</span></h1>
+                <p class="hero-subtitle">Temukan gadget dan aksesoris terbaik dengan desain futuristik dan performa tinggi.</p>
+                <button class="btn btn-primary" onclick="document.getElementById('products-section').scrollIntoView({behavior: 'smooth'})">
+                    Belanja Sekarang <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div style="flex-grow: 1; display: flex; justify-content: center;">
+                <i class="fas fa-headset" style="font-size: 15rem; color: var(--bg-card); text-shadow: 0 0 50px var(--primary);"></i>
+            </div>
+        </section>
+
+        <div class="flash-sale">
+            <h2>⚡ FLASH SALE BERAKHIR DALAM</h2>
+            <div class="timer" id="countdown">02:14:55</div>
+            <p>Gunakan Kode: <b>FLASH70</b> untuk Diskon 70%!</p>
+        </div>
+
+        <section id="products-section">
+            <div class="section-header">
+                <h2>Produk Pilihan</h2>
+                
+                <div class="filter-group">
+                    <select class="select-modern" onchange="app.sortProducts(this.value)">
+                        <option value="default">Urutan Standar</option>
+                        <option value="cheap">Harga Terendah</option>
+                        <option value="expensive">Harga Tertinggi</option>
+                        <option value="rating">Rating Tertinggi</option>
+                    </select>
+
+                    <button class="btn btn-sm btn-outline" onclick="app.filterProducts('all')">Semua</button>
+                    <button class="btn btn-sm btn-outline" onclick="app.filterProducts('gadget')">Gadget</button>
+                    <button class="btn btn-sm btn-outline" onclick="app.filterProducts('fashion')">Fashion</button>
+                </div>
+            </div>
+            
+            <div class="product-grid" id="product-grid">
+                </div>
+        </section>
+
+        <section style="margin: 80px 0; text-align: center;">
+            <h2 style="margin-bottom: 30px;">Apa Kata Mereka?</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                    <div style="color: #facc15; margin-bottom: 10px;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Checkout via WhatsApp lancar banget, admin fast respon!"</p>
+                    <h4 style="margin-top: 15px; color: var(--primary);">Budi Santoso</h4>
+                </div>
+                <div style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                    <div style="color: #facc15; margin-bottom: 10px;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Fitur wishlist ngebantu banget buat nyimpen barang inceran."</p>
+                    <h4 style="margin-top: 15px; color: var(--primary);">Siti Aminah</h4>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <h3>Sore Store</h3>
+            <p style="margin: 10px 0;">Jl. Kenangan No. 505, Unknown</p>
+            <p>&copy; 2026 Sann. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="cart-modal">
+        <div class="modal-box">
+            <i class="fas fa-times close-modal" onclick="app.closeModal('cart-modal')"></i>
+            <h2>Keranjang Belanja</h2>
+            <div id="cart-items" style="margin-top: 20px;"></div>
+            
+            <div class="promo-section" id="cart-summary" style="display:none;">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <input type="text" id="promo-input" class="input-modern" placeholder="Kode Promo (ex: FLASH70)">
+                    <button class="btn btn-sm btn-outline" onclick="app.applyPromo()">Pakai</button>
+                </div>
+                
+                <div class="summary-row"><span>Subtotal:</span> <span id="cart-subtotal">Rp 0</span></div>
+                <div class="summary-row" id="discount-row" style="display:none;">
+                    <span>Diskon (<span id="promo-name"></span>):</span> 
+                    <span class="discount-text">- <span id="cart-discount">Rp 0</span></span>
+                </div>
+                <div class="summary-row" style="font-size: 1.2rem; font-weight: bold; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <span>Total Akhir:</span>
+                    <span id="cart-final-total" style="color: var(--accent);">Rp 0</span>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="app.checkout()">
+                    <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+                </button>
+                <div class="loader" id="checkout-loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-box">
+            <i class="fas fa-times close-modal" onclick="app.closeModal('product-modal')"></i>
+            <div class="detail-layout" id="product-detail-content"></div>
+            
+            <div class="recommendation-section">
+                <h4>Kamu mungkin juga suka:</h4>
+                <div class="rec-grid" id="rec-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wishlist-modal">
+        <div class="modal-box">
+            <i class="fas fa-times close-modal" onclick="app.closeModal('wishlist-modal')"></i>
+            <h2>Wishlist Favorit</h2>
+            <div id="wishlist-items" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal-box">
+            <i class="fas fa-times close-modal" onclick="app.closeModal('history-modal')"></i>
+            <h2>Riwayat Pembelian</h2>
+            <div id="history-items" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT LOGIC --- */
+
+        // Data Produk Dummy
+        const productsData = [
+            { id: 1, name: "Neon Cyber Headset", price: 750000, category: "gadget", rating: 4.8, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60", desc: "Headset dengan noise cancelling aktif." },
+            { id: 2, name: "Smart Watch Z", price: 1200000, category: "gadget", rating: 4.9, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60", desc: "Jam tangan pintar dengan pelacak kesehatan." },
+            { id: 3, name: "Sneakers Urban", price: 450000, category: "fashion", rating: 4.5, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60", desc: "Desain ergonomis untuk kenyamanan maksimal." },
+            { id: 4, name: "Mechanical Keyboard", price: 850000, category: "gadget", rating: 4.7, image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=500&auto=format&fit=crop&q=60", desc: "Keyboard mekanik dengan switch biru." },
+            { id: 5, name: "Hoodie Techwear", price: 350000, category: "fashion", rating: 4.6, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&auto=format&fit=crop&q=60", desc: "Hoodie tahan air bergaya futuristik." },
+            { id: 6, name: "Gaming Mouse X", price: 300000, category: "gadget", rating: 4.4, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&auto=format&fit=crop&q=60", desc: "Mouse gaming presisi tinggi." }
+        ];
+
+        // Valid Promo Codes
+        const PROMO_CODES = {
+            'SORE10': { type: 'percent', value: 0.1, max: 9999999 },
+            'FLASH70': { type: 'percent', value: 0.7, max: 100000 }
+        };
+
+        const app = {
+            cart: JSON.parse(localStorage.getItem('neonCart')) || [],
+            wishlist: JSON.parse(localStorage.getItem('neonWishlist')) || [],
+            history: JSON.parse(localStorage.getItem('neonHistory')) || [],
+            products: productsData,
+            activePromo: null,
+            currentSort: 'default',
+            activeCategory: 'all',
+            
+            init: function() {
+                this.renderProducts(this.products);
+                this.updateCartCount();
+                this.updateWishlistCount();
+                this.startCountdown();
+                this.checkTheme();
+            },
+
+            // --- Theme Logic ---
+            toggleTheme: function() {
+                const body = document.body;
+                const icon = document.getElementById('theme-icon');
+                if (body.getAttribute('data-theme') === 'dark') {
+                    body.setAttribute('data-theme', 'light');
+                    icon.className = 'fas fa-sun';
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    icon.className = 'fas fa-moon';
+                }
+            },
+            
+            checkTheme: function() {
+                // Default dark defined in HTML
+            },
+
+            // --- Product Rendering & Filtering (UPDATED STEP 4: Sort & Empty) ---
+            renderProducts: function(list) {
+                const container = document.getElementById('product-grid');
+                container.innerHTML = '';
+
+                // Step 4: Handle Empty State
+                if (list.length === 0) {
+                    container.innerHTML = this.getEmptyState('Produk tidak ditemukan');
+                    return;
+                }
+                
+                list.forEach(p => {
+                    // Check logic for active wishlist
+                    const isWishlisted = this.wishlist.some(w => w.id === p.id);
+                    const heartClass = isWishlisted ? 'active' : '';
+
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <button class="wishlist-toggle ${heartClass}" onclick="app.toggleWishlist(${p.id}, event)">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <img src="${p.image}" class="card-img" alt="${p.name}">
+                        <div class="card-body">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span class="badge badge-hot">PROMO</span>
+                                <div class="card-rating"><i class="fas fa-star"></i> ${p.rating}</div>
+                            </div>
+                            <h3 class="card-title">${p.name}</h3>
+                            <p class="card-price">Rp ${p.price.toLocaleString('id-ID')}</p>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-outline" style="flex:1" onclick="app.showDetail(${p.id})">Detail</button>
+                                <button class="btn btn-sm btn-primary" style="flex:1" onclick="app.addToCart(${p.id})">
+                                    <i class="fas fa-plus"></i> Beli
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            },
+
+            filterProducts: function(cat) {
+                this.activeCategory = cat;
+                let filtered = cat === 'all' ? this.products : this.products.filter(p => p.category === cat);
+                this.applySort(filtered);
+            },
+
+            searchProducts: function(keyword) {
+                const filtered = this.products.filter(p => p.name.toLowerCase().includes(keyword.toLowerCase()));
+                this.renderProducts(filtered);
+            },
+
+            sortProducts: function(type) {
+                this.currentSort = type;
+                let list = this.activeCategory === 'all' 
+                    ? [...this.products] 
+                    : this.products.filter(p => p.category === this.activeCategory);
+                this.applySort(list);
+            },
+
+            applySort: function(list) {
+                if (this.currentSort === 'cheap') list.sort((a, b) => a.price - b.price);
+                if (this.currentSort === 'expensive') list.sort((a, b) => b.price - a.price);
+                if (this.currentSort === 'rating') list.sort((a, b) => b.rating - a.rating);
+                this.renderProducts(list);
+            },
+
+            getEmptyState: function(msg) {
+                return `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>${msg}</p>
+                    </div>
+                `;
+            },
+
+            // --- Step 1: Wishlist System ---
+            toggleWishlist: function(id, event) {
+                if(event) event.stopPropagation(); // Mencegah bubble event ke card
+                
+                const index = this.wishlist.findIndex(w => w.id === id);
+                const btn = event ? event.currentTarget : null;
+
+                if (index > -1) {
+                    this.wishlist.splice(index, 1);
+                    this.showToast('Dihapus dari Wishlist');
+                    if(btn) btn.classList.remove('active');
+                } else {
+                    const product = this.products.find(p => p.id === id);
+                    this.wishlist.push(product);
+                    this.showToast('Ditambahkan ke Wishlist', 'success');
+                    if(btn) btn.classList.add('active');
+                }
+                
+                localStorage.setItem('neonWishlist', JSON.stringify(this.wishlist));
+                this.updateWishlistCount();
+                
+                // Re-render jika modal wishlist terbuka
+                if(document.getElementById('wishlist-modal').classList.contains('active')) {
+                    this.renderWishlistItems();
+                }
+                // Update heart di product grid
+                this.filterProducts(this.activeCategory); 
+            },
+
+            updateWishlistCount: function() {
+                document.getElementById('wishlist-count').innerText = this.wishlist.length;
+            },
+
+            renderWishlistItems: function() {
+                const container = document.getElementById('wishlist-items');
+                container.innerHTML = '';
+                
+                if(this.wishlist.length === 0) {
+                    container.innerHTML = this.getEmptyState('Belum ada produk favorit.');
+                    return;
+                }
+
+                this.wishlist.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+                        <div style="display:flex; align-items:center;">
+                            <img src="${item.image}">
+                            <div>
+                                <h4>${item.name}</h4>
+                                <div style="font-size:0.9rem; color:var(--text-muted);">Rp ${item.price.toLocaleString('id-ID')}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-sm btn-primary" onclick="app.addToCart(${item.id}); app.toggleWishlist(${item.id})">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="app.toggleWishlist(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            // --- Product Details & Step 6: Smart Recommendations ---
+            showDetail: function(id) {
+                const p = this.products.find(x => x.id === id);
+                const content = document.getElementById('product-detail-content');
+                const recContainer = document.getElementById('rec-grid');
+                
+                // Render Main Detail
+                content.innerHTML = `
+                    <div>
+                        <img src="${p.image}" style="width:100%; border-radius: var(--radius-md); box-shadow: var(--shadow);">
+                    </div>
+                    <div>
+                        <h2 style="font-size: 2rem; margin-bottom: 10px;">${p.name}</h2>
+                        <div style="font-size: 1.5rem; color: var(--accent); font-weight: bold; margin-bottom: 20px;">
+                            Rp ${p.price.toLocaleString('id-ID')}
+                        </div>
+                        <p style="margin-bottom: 20px; line-height: 1.6;">${p.desc}</p>
+                        
+                        <h4 style="margin-bottom:10px;">Spesifikasi Unggulan:</h4>
+                        <ul class="detail-specs">
+                            <li><i class="fas fa-check-circle"></i> Garansi Resmi 1 Tahun</li>
+                            <li><i class="fas fa-check-circle"></i> Original 100%</li>
+                            <li><i class="fas fa-check-circle"></i> Support 24/7</li>
+                        </ul>
+
+                        <div style="margin-top: 30px; display: flex; gap: 15px;">
+                            <button class="btn btn-primary" onclick="app.addToCart(${p.id}); app.closeModal('product-modal')">
+                                <i class="fas fa-cart-plus"></i> Masukkan Keranjang
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Step 6: Render Recommendations
+                // Filter same category, exclude current ID, take max 4
+                const recs = this.products
+                    .filter(x => x.category === p.category && x.id !== p.id)
+                    .slice(0, 4);
+                
+                recContainer.innerHTML = '';
+                if(recs.length === 0) {
+                    recContainer.innerHTML = '<p class="text-muted">Tidak ada rekomendasi.</p>';
+                } else {
+                    recs.forEach(r => {
+                        const recCard = document.createElement('div');
+                        recCard.className = 'rec-card';
+                        recCard.onclick = () => app.showDetail(r.id);
+                        recCard.innerHTML = `
+                            <img src="${r.image}">
+                            <div style="font-size:0.8rem; font-weight:600;">${r.name}</div>
+                            <div style="font-size:0.75rem; color:var(--accent);">Rp ${r.price.toLocaleString('id-ID')}</div>
+                        `;
+                        recContainer.appendChild(recCard);
+                    });
+                }
+                
+                this.openModal('product-modal');
+            },
+
+            // --- Cart Logic & Step 2: Promo Code ---
+            addToCart: function(id) {
+                const product = this.products.find(p => p.id === id);
+                const existing = this.cart.find(c => c.id === id);
+                
+                if(existing) {
+                    existing.qty++;
+                } else {
+                    this.cart.push({...product, qty: 1});
+                }
+                
+                this.saveCart();
+                this.showToast(`Berhasil menambahkan ${product.name}`, 'success');
+            },
+
+            updateQty: function(id, change) {
+                const item = this.cart.find(c => c.id === id);
+                if(item) {
+                    item.qty += change;
+                    if(item.qty < 1) {
+                        this.cart = this.cart.filter(c => c.id !== id);
+                    }
+                    this.saveCart();
+                    this.renderCartItems();
+                }
+            },
+
+            saveCart: function() {
+                localStorage.setItem('neonCart', JSON.stringify(this.cart));
+                this.updateCartCount();
+            },
+
+            updateCartCount: function() {
+                const count = this.cart.reduce((sum, item) => sum + item.qty, 0);
+                document.getElementById('cart-count').innerText = count;
+            },
+
+            openCart: function() {
+                this.activePromo = null; // Reset promo saat buka cart ulang
+                this.renderCartItems();
+                this.openModal('cart-modal');
+            },
+
+            renderCartItems: function() {
+                const container = document.getElementById('cart-items');
+                const summary = document.getElementById('cart-summary');
+                container.innerHTML = '';
+                
+                if(this.cart.length === 0) {
+                    container.innerHTML = this.getEmptyState('Keranjang kosong.');
+                    summary.style.display = 'none';
+                    return;
+                }
+
+                summary.style.display = 'block';
+                let subtotal = 0;
+
+                this.cart.forEach(item => {
+                    subtotal += item.price * item.qty;
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+                        <div style="display:flex; align-items:center;">
+                            <img src="${item.image}">
+                            <div class="cart-info">
+                                <h4>${item.name}</h4>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Rp ${item.price.toLocaleString('id-ID')}</div>
+                            </div>
+                        </div>
+                        <div class="cart-controls">
+                            <button class="qty-btn" onclick="app.updateQty(${item.id}, -1)">-</button>
+                            <span>${item.qty}</span>
+                            <button class="qty-btn" onclick="app.updateQty(${item.id}, 1)">+</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                this.calculateTotal(subtotal);
+            },
+
+            // Step 2 Logic: Apply Promo
+            applyPromo: function() {
+                const code = document.getElementById('promo-input').value.toUpperCase();
+                const promo = PROMO_CODES[code];
+                
+                if (promo) {
+                    this.activePromo = { ...promo, code: code };
+                    this.renderCartItems(); // Recalculate
+                    this.showToast('Kode promo berhasil dipasang!', 'success');
+                } else {
+                    this.activePromo = null;
+                    this.renderCartItems();
+                    this.showToast('Kode promo tidak valid.', 'normal');
+                }
+            },
+
+            calculateTotal: function(subtotal) {
+                let discount = 0;
+                
+                if (this.activePromo) {
+                    if (this.activePromo.type === 'percent') {
+                        discount = subtotal * this.activePromo.value;
+                        if (discount > this.activePromo.max) discount = this.activePromo.max;
+                    }
+                    
+                    document.getElementById('discount-row').style.display = 'flex';
+                    document.getElementById('promo-name').innerText = this.activePromo.code;
+                    document.getElementById('cart-discount').innerText = 'Rp ' + discount.toLocaleString('id-ID');
+                } else {
+                    document.getElementById('discount-row').style.display = 'none';
+                }
+
+                const finalTotal = subtotal - discount;
+                
+                document.getElementById('cart-subtotal').innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
+                document.getElementById('cart-final-total').innerText = 'Rp ' + finalTotal.toLocaleString('id-ID');
+                
+                return { subtotal, discount, finalTotal };
+            },
+
+            // --- Step 5: WhatsApp Checkout & Step 3: History ---
+            checkout: function() {
+                if(this.cart.length === 0) return;
+                
+                const btn = document.querySelector('#cart-modal .btn-primary');
+                const loader = document.getElementById('checkout-loader');
+                
+                btn.style.display = 'none';
+                loader.style.display = 'block';
+                
+                // 1. Calculate final numbers
+                let subtotal = this.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+                let discount = 0;
+                if(this.activePromo) {
+                     discount = subtotal * this.activePromo.value;
+                     if(discount > this.activePromo.max) discount = this.activePromo.max;
+                }
+                const total = subtotal - discount;
+
+                // 2. Step 3: Save to History
+                const orderData = {
+                    id: 'ORD-' + Date.now(),
+                    date: new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                    items: [...this.cart],
+                    total: total,
+                    status: 'Selesai'
+                };
+                
+                this.history.unshift(orderData); // Add to top
+                localStorage.setItem('neonHistory', JSON.stringify(this.history));
+
+                // 3. Step 5: Generate WA Message
+                let message = `Halo Admin NEON Store,\nSaya ingin memesan:\n\n`;
+                this.cart.forEach((item, idx) => {
+                    message += `${idx+1}. ${item.name} (${item.qty}x) - Rp ${(item.price * item.qty).toLocaleString('id-ID')}\n`;
+                });
+                
+                message += `\nSubtotal: Rp ${subtotal.toLocaleString('id-ID')}`;
+                if(discount > 0) message += `\nDiskon (${this.activePromo.code}): -Rp ${discount.toLocaleString('id-ID')}`;
+                message += `\n*TOTAL BAYAR: Rp ${total.toLocaleString('id-ID')}*`;
+                message += `\n\nMohon diproses terima kasih!`;
+
+                // 4. Reset & Redirect
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    btn.style.display = 'flex';
+                    
+                    this.cart = [];
+                    this.activePromo = null;
+                    this.saveCart();
+                    this.closeModal('cart-modal');
+                    this.showToast('Mengarahkan ke WhatsApp...', 'success');
+                    
+                    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    window.open(url, '_blank');
+                }, 1500);
+            },
+
+            // --- Step 3: Render History ---
+            renderHistoryItems: function() {
+                const container = document.getElementById('history-items');
+                container.innerHTML = '';
+                
+                if(this.history.length === 0) {
+                    container.innerHTML = this.getEmptyState('Belum ada riwayat pembelian.');
+                    return;
+                }
+
+                this.history.forEach(order => {
+                    const div = document.createElement('div');
+                    div.className = 'history-card';
+                    div.onclick = function() { this.classList.toggle('open'); };
+                    
+                    let itemsHtml = order.items.map(i => `<li>${i.name} (${i.qty}x)</li>`).join('');
+
+                    div.innerHTML = `
+                        <div class="history-header">
+                            <span>${order.date}</span>
+                            <span style="color:var(--success)">Rp ${order.total.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div style="font-size:0.9rem; display:flex; justify-content:space-between;">
+                            <span>ID: ${order.id}</span>
+                            <span class="badge badge-new">Selesai</span>
+                        </div>
+                        <div class="history-details">
+                            <ul style="list-style:disc; padding-left:20px; margin-bottom:10px;">
+                                ${itemsHtml}
+                            </ul>
+                            <p style="text-align:right; font-size:0.8rem;">Klik untuk tutup</p>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            // --- Utilities ---
+            openModal: function(id) {
+                if(id === 'wishlist-modal') this.renderWishlistItems();
+                if(id === 'history-modal') this.renderHistoryItems();
+                document.getElementById(id).classList.add('active');
+            },
+            
+            closeModal: function(id) {
+                document.getElementById(id).classList.remove('active');
+            },
+
+            showToast: function(msg, type = 'normal') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                if(type === 'success') toast.style.borderLeftColor = 'var(--success)';
+                
+                toast.innerHTML = `<i class="fas fa-info-circle"></i> <span>${msg}</span>`;
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideIn 0.3s reverse forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            },
+
+            startCountdown: function() {
+                let time = 5 * 60 * 60; 
+                const el = document.getElementById('countdown');
+                setInterval(() => {
+                    if(time > 0) {
+                        time--;
+                        const h = Math.floor(time / 3600).toString().padStart(2,'0');
+                        const m = Math.floor((time % 3600) / 60).toString().padStart(2,'0');
+                        const s = (time % 60).toString().padStart(2,'0');
+                        el.innerText = `${h}:${m}:${s}`;
+                    }
+                }, 1000);
+            },
+            
+            navigate: function(where) {
+                if(where === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>
