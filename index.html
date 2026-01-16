@@ -229,7 +229,7 @@
             <div class="hero-bg"></div>
             <div class="hero-content">
                 <span class="badge badge-new" style="margin-bottom: 10px; display: inline-block;">New Arrival 2026</span>
-                <h1 class="hero-title">Teknologi Masa Depan <br><span style="color: var(--primary)">Dalam Genggaman</span></h1>
+                <h1 class="hero-title">test <br><span style="color: var(--primary)">Dalam Genggaman</span></h1>
                 <p class="hero-subtitle">Temukan gadget dan aksesoris terbaik dengan desain futuristik dan performa tinggi.</p>
                 <button class="btn btn-primary" onclick="document.getElementById('products-section').scrollIntoView({behavior: 'smooth'})">
                     Belanja Sekarang <i class="fas fa-arrow-right"></i>
@@ -774,14 +774,15 @@
                 setTimeout(() => {
                     loader.style.display = 'none';
                     btn.style.display = 'flex';
-                    
+    
                     this.cart = [];
                     this.activePromo = null;
                     this.saveCart();
                     this.closeModal('cart-modal');
                     this.showToast('Mengarahkan ke WhatsApp...', 'success');
-                    
-                    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+                    const phoneNumber = '447723442693'; // NOMOR ADMIN
+                    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                     window.open(url, '_blank');
                 }, 1500);
             },
