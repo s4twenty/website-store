@@ -14,8 +14,8 @@
             --bg-nav: rgba(15, 23, 42, 0.85);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --primary: #6366f1; /* Indigo Neon */
-            --accent: #06b6d4; /* Cyan Neon */
+            --primary: #6366f1; 
+            --accent: #06b6d4; 
             --danger: #ef4444;
             --success: #22c55e;
             --glass: rgba(255, 255, 255, 0.05);
@@ -148,7 +148,7 @@
         @media (max-width: 768px) {
             .hero-title { font-size: 2.5rem; }
             .detail-layout { grid-template-columns: 1fr; }
-            .nav-links span { display: none; } /* Hide text on mobile nav */
+            .nav-links span { display: none; } 
             .nav-links i { font-size: 1.2rem; }
             .input-group { flex-direction: column; }
             .search-bar input { width: 150px; }
@@ -600,7 +600,7 @@
             },
 
             openCart: function() {
-                this.activePromo = null; // Reset promo saat buka cart ulang
+                this.activePromo = null; 
                 this.renderCartItems();
                 this.openModal('cart-modal');
             },
@@ -649,7 +649,7 @@
                 
                 if (promo) {
                     this.activePromo = { ...promo, code: code };
-                    this.renderCartItems(); // Recalculate
+                    this.renderCartItems();
                     this.showToast('Kode promo berhasil dipasang!', 'success');
                 } else {
                     this.activePromo = null;
@@ -707,7 +707,7 @@
                     status: 'Selesai'
                 };
                 
-                this.history.unshift(orderData); // Add to top
+                this.history.unshift(orderData); 
                 localStorage.setItem('neonHistory', JSON.stringify(this.history));
 
                 let message = `Halo Admin Sann Store,\nSaya ingin memesan:\n\n`;
@@ -730,7 +730,7 @@
                     this.closeModal('cart-modal');
                     this.showToast('Mengarahkan ke WhatsApp...', 'success');
 
-                    const phoneNumber = '447723442693'; // NOMOR ADMIN
+                    const phoneNumber = '447723442693'; 
                     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                     window.open(url, '_blank');
                 }, 1500);
